@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- Import style -->
+    <link rel="stylesheet" href="//unpkg.com/element-plus/dist/index.css"/>
+    <!-- Import Vue 3 -->
+    <script src="//unpkg.com/vue@3"></script>
+    <!-- Import component library -->
+    <script src="//unpkg.com/element-plus"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <style>
+        img {
+            float: right;
+            width: 50px;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <span>姓名: {{employee.name}}</span>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <span>部门: {{employee.departmentName}}</span>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <span>头衔: {{employee.title}}</span>
+    <img :src="employee.path">
+</div>
+</body>
+<script>
+    const Main = {
+        data() {
+            return {
+                employee: {}
+            }
+        },
+        mounted() {
+            axios.get("/api/getEmp?eid=" + sessionStorage.eid).then(response => {
+                console.info(response);
+                const json = response.data;
+                if (json.code === "0") {
+                    this.employee = json.data.emp;
+                }
+                console.info(this.employee);
+            })
+        },
+        methods: {}
+    }
+
+    const app = Vue.createApp(Main);
+    app.use(ElementPlus);
+    app.mount("#app");
+
+</script>
+</html>
