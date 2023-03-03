@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.example.mapper.ProcessFlowMapper">
+
+
+    <insert id="insert" parameterType="top.example.entity.ProcessFlow">
+        insert into adm_process_flow(form_id,
+                                     operator_id,
+                                     action,
+                                     result,
+                                     reason,
+                                     create_time,
+                                     audit_time,
+                                     order_no,
+                                     state,
+                                     is_last)
+        values (#{pflow.formId},
+                #{pflow.operatorId},
+                #{pflow.action},
+                #{pflow.result},
+                #{pflow.reason},
+                #{pflow.createTime},
+                #{pflow.auditTime},
+                #{pflow.orderNo},
+                #{pflow.state},
+                #{pflow.isLast})
+    </insert>
+
+
+</mapper>

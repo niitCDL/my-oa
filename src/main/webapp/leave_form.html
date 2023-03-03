@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>请假申请</title>
+    <link rel="stylesheet" href="//unpkg.com/element-plus/dist/index.css"/>
+    <!-- Import Vue 3 -->
+    <script src="//unpkg.com/vue@3"></script>
+    <!-- Import component library -->
+    <script src="//unpkg.com/element-plus"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/@element-plus/icons-vue"></script>
+    <script src="//unpkg.com/element-plus/dist/locale/zh-cn"></script>
+    <style>
+        .el-form {
+            border: 1px solid #DCDFE6;
+            width: 600px;
+            margin: 120px auto;
+            padding: 35px 35px 15px 35px;
+            border-radius: 5px;
+            -webkit-border-radius: 5px;
+            -moz-border-radius: 5px;
+            box-shadow: 0 0 25px #909399;
+        }
+
+        .btn-wrapper {
+            text-align: center;
+            padding-top: 30px;
+        }
+    </style>
+</head>
+
+
+<body>
+<div id="app">
+    <el-form ref="leaveForm" :model="form" :rules="rules" label-width="80px">
+        <el-descriptions title="请假申请单" :column="1" border>
+            <el-descriptions-item label="部门">{{ employee.departmentName }}</el-descriptions-item>
+            <el-descriptions-item label="申请人">{{ employee.name }}[{{ employee.title }}]</el-descriptions-item>
+            <el-descriptions-item label="请假类型">
+                <el-select v-model="form.formType" style="width: 100%">
+                    <el-option label="事假" value="1"></el-option>
+                    <el-option label="病假" value="2"></el-option>
+                    <el-option label="工伤假" value="3"></el-option>
+                    <el-option label="婚嫁" value="4"></el-option>
+                    <el-option label="产假" value="5"></el-option>
+                    <el-option label="丧假" value="6"></el-option>
+                </el-select>
+            </el-descriptions-item>
+
+            <el-descriptions-item label="请假时间">
+                <el-form-item prop="timeRange" label-width="0px">
+                    <div class="block">
+                        <el-date-picker
+                                v-model="form.timeRange"
+                                type="datetimerange"
+                                range-separator="至"
+                                start-placeholder="开始日期"
+                                end-placeholder="结束日期"
+                                @change="changeTimeRange">
+                        </el-date-picker>
+                    </div>
+                </el-form-item>
+            </el-descriptions-item>
+
+            <el-descriptions-item label="请假原因">
+                <el-form-item prop="reason" label-width="0px">
+                    <el-input type="text" placeholder="请输入请假原因" v-model="form.reason"></el-input>
+                </el-form-item>
+            </el-descriptions-item>
+        </el-descriptions>
+
+        <div class="btn-wrapper">
+            <el-button type="primary" v-on:click="onSubmit('leaveForm')">立即申请</el-button>
+        </div>
+    </el-form>
+</div>
+
+<script>
+    const Main = {
+        data() {
+            return {
+                employee: {},
+                department: {},
+                form: {
+                    formType: "",
+                    timeRange: "",
+                    startTime: "",
+                    endTime: "",
+                    reason: "",
+                    eid: ""
+                },
+                // 表单验证，需要在 el-form-item 元素中增加 prop 属性
+                rules: {
+                    timeRange: [
+                        {required: true, message: '请选择请假时间', trigger: 'blur'}
+                    ],
+                    reason: [
+                        {required: true, message: '请填写请假原因', trigger: 'blur'}
+                    ]
+                }
+            }
+        },
+        methods: {
+            changeTimeRange() {
+                console.info(this.form.timeRange);
+                this.form.startTime = this.form.timeRange[0].getTime();
+                this.form.endTime = this.form.timeRange[1].getTime();
+            },
+            onSubmit(formName) {
+                const form = this.$refs[formName];
+                form.validate((res) => {
+                    if (res) {
+                        const form = this.form;
+                        const $message = this.$message;
+                        const params = new URLSearchParams();
+                        params.append("formType", form.formType);
+                        params.append("startTime", form.startTime);
+                        params.append("endTime", form.endTime);
+                        params.append("reason", form.reason);
+                        params.append("eid", this.employee.employeeId);
+
+                        axios.post("/api/leave/create", params).then(response => {
+                            console.info(response);
+                            const json = response.data;
+                            if (json.code === "0") {
+                                this.$alert("请假单已提交,等待上级审批", {
+                                    callback: function () {
+                                        window.location.href = "/notice.html";
+                                    }
+                                })
+                            } else {
+                                $message.error({message: json.message, offset: 100});
+                            }
+                        })
+                    }
+                })
+            }
+        },
+        mounted() {
+            this.employee = JSON.parse(localStorage.getItem("employee"));
+            // this.department = JSON.parse(localStorage.getItem("department"));
+        }
+    };
+    const app = Vue.createApp(Main);
+    app.use(ElementPlus, {locale: ElementPlusLocaleZhCn});
+    app.mount("#app");
+</script>
+</body>
+</html>

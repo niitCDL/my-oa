@@ -25,6 +25,10 @@
         <mapper resource="mappers/TestMapper.xml"/>
         <mapper resource="mappers/UserMapper.xml"/>
         <mapper resource="mappers/EmployeeMapper.xml"/>
+        <mapper resource="mappers/DepartmentMapper.xml"/>
+        <mapper resource="mappers/NodeMapper.xml"/>
+        <mapper resource="mappers/LeaveFormMapper.xml"/>
+        <mapper resource="mappers/ProcessFlowMapper.xml"/>
     </mappers>
 
 

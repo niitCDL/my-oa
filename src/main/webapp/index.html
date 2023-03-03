@@ -9,29 +9,124 @@
     <!-- Import component library -->
     <script src="//unpkg.com/element-plus"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/@element-plus/icons-vue"></script>
     <style>
-        img {
-            float: right;
-            width: 50px;
-            border-radius: 50%;
+        html,
+        body,
+        #app,
+        .el-container {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            max-height: 100%;
         }
+
+        .el-header {
+            background-color: #88B9F9;
+            color: #fff;
+            height: 70px;
+            line-height: 70px;
+        }
+
+        .title {
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .info {
+            margin-top: 20px;
+            margin-left: 15px;
+            color: #fff;
+            font-size: 16px;
+        }
+
+        .main-frame {
+            width: 100%;
+            height: 95%;
+            border: 0;
+        }
+
     </style>
 </head>
 <body>
+<!--<template>-->
+
+<!--</template>-->
 <div id="app">
-    <span>姓名: {{employee.name}}</span>
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    <span>部门: {{employee.departmentName}}</span>
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    <span>头衔: {{employee.title}}</span>
-    <img :src="employee.path">
+    <el-container style="border: 1px solid #eee">
+        <el-header>
+            <el-row>
+                <el-col :span="8">
+                    <span class="title">OA 办公系统</span>
+                </el-col>
+                <el-col :span="12">
+                </el-col>
+                <el-col :span="4" style="padding-top: 5px;">
+                    <el-dropdown>
+                        <span class="info">{{employee.name}}/{{employee.departmentName}}/{{employee.title}}</span>
+                        <template #dropdown>
+                            <el-dropdown-menu>
+                                <el-dropdown-item v-on:click="logout">注销</el-dropdown-item>
+                            </el-dropdown-menu>
+                        </template>
+                    </el-dropdown>
+                    <el-avatar :src="employee.path" :size="45" style="margin-left: 10px;margin-top: 5px"></el-avatar>
+                </el-col>
+            </el-row>
+        </el-header>
+
+        <el-container>
+            <el-aside width="200px" style="max-height: 100%;background-color: rgb(238,241,246)">
+                <el-menu default-active="1">
+                    <template v-for="(n,idx) in nodeList">
+                        <el-sub-menu v-if="n.children.length > 0" :index="idx.toString()">
+                            <template #title>
+                                <el-icon>
+                                    <component :is="n.node.icon"></component>
+                                </el-icon>
+                                <span>{{n.node.nodeName}}</span>
+                            </template>
+                            <el-menu-item v-for="child in n.children"
+                                          :index="child.nodeId.toString()"
+                                          v-on:click="showPage(child.url)">
+                                <el-icon>
+                                    <component :is="child.icon"></component>
+                                </el-icon>
+                                {{child.nodeName}}
+                            </el-menu-item>
+                        </el-sub-menu>
+                        <el-menu-item v-else v-on:click="showPage(n.node.url)" :index="idx.toString()">
+                            <template #title>
+                                <el-icon>
+                                    <component :is="n.node.icon"></component>
+                                </el-icon>
+                                <span>{{n.node.nodeName}}</span>
+                            </template>
+                        </el-menu-item>
+                    </template>
+                </el-menu>
+            </el-aside>
+            <el-main>
+                <iframe id="main" name="main" src="notice.html" class="main-frame"></iframe>
+            </el-main>
+        </el-container>
+    </el-container>
 </div>
+<!--<div id="app">-->
+<!--    <span>姓名: {{employee.name}}</span>-->
+<!--    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->
+<!--    <span>部门: {{employee.departmentName}}</span>-->
+<!--    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->
+<!--    <span>头衔: {{employee.title}}</span>-->
+<!--    <img :src="employee.path">-->
+<!--</div>-->
 </body>
 <script>
     const Main = {
         data() {
             return {
-                employee: {}
+                employee: {},
+                nodeList: {}
             }
         },
         mounted() {
@@ -41,15 +136,33 @@
                 if (json.code === "0") {
                     this.employee = json.data.emp;
                 }
-                console.info(this.employee);
+                localStorage.setItem("employee",JSON.stringify(this.employee));
+            })
+
+            axios.get("/api/node?uid=" + sessionStorage.uid).then(response => {
+                const json = response.data.data;
+                this.nodeList = json.nodeList;
+                console.log(json);
             })
         },
-        methods: {}
+        methods: {
+            showPage(url) {
+                document.getElementById("main").src = url;
+            },
+            logout() {
+                localStorage.clear();
+                window.location.href = "/login.html";
+            }
+        }
     }
 
     const app = Vue.createApp(Main);
+    for([name,comp] of Object.entries(ElementPlusIconsVue)){
+        app.component(name,comp);
+    }
     app.use(ElementPlus);
     app.mount("#app");
+
 
 </script>
 </html>

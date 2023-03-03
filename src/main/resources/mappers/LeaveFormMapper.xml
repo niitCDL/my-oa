@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.example.mapper.LeaveFormMapper">
+
+
+    <insert id="insert" parameterType="top.example.entity.LeaveForm">
+        insert into adm_leave_form(employee_id,
+                                   form_type,
+                                   start_time,
+                                   end_time,
+                                   reason,
+                                   create_time,
+                                   state)
+        values (#{form.employeeId},
+                #{form.formType},
+                #{form.startTime},
+                #{form.endTime},
+                #{form.reason},
+                #{form.createTime},
+                #{form.state})
+    </insert>
+
+    <select id="getMaxId" resultType="long">
+        select max(form_id) + 1
+        from adm_leave_form
+    </select>
+
+
+</mapper>

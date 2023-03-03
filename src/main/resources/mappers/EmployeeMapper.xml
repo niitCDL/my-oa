@@ -15,6 +15,17 @@
         where department_id = #{id}
     </select>
 
+    <select id="getManagerByEmp" parameterType="top.example.entity.Employee" resultType="top.example.entity.Employee">
+        select * from adm_employee
+        <where>
+            <if test="emp.title == '部门经理'">
+                title = '总经理'
+            </if>
+            <if test="emp.title != '部门经理'">
+                department_id = #{emp.departmentId} and title = '部门经理'
+            </if>
+        </where>
+    </select>
 
 
 
