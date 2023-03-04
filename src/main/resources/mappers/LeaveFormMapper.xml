@@ -21,9 +21,44 @@
     </insert>
 
     <select id="getMaxId" resultType="long">
-        select max(form_id) + 1
+        select max(form_id)
         from adm_leave_form
     </select>
 
+    <update id="update" parameterType="top.example.entity.LeaveForm">
+        update adm_leave_form
+        set employee_id=#{form.employeeId},
+            form_type=#{form.formType},
+            start_time=#{form.startTime},
+            end_time=#{form.endTime},
+            reason=#{form.reason},
+            create_time=#{form.createTime},
+            state=#{form.state}
+        where form_id = #{form.formId}
+    </update>
+
+    <select id="selectById" parameterType="long" resultType="top.example.entity.LeaveForm">
+        select *
+        from adm_leave_form
+        where form_id = #{id}
+    </select>
+
+    <select id="selectByParams" resultType="java.util.LinkedHashMap">
+        select f.*, e.name,d.*
+        from adm_leave_form f,
+        adm_process_flow pf,
+        adm_employee e,
+        adm_department d
+        where
+        f.form_id = pf.form_id
+        and f.employee_id = e.employee_id
+        and e.department_id = d.department_id
+        <if test="state != null">
+            and pf.state = #{state}
+        </if>
+        <if test="operatorId != null">
+            and pf.operator_id = #{operatorId}
+        </if>
+    </select>
 
 </mapper>

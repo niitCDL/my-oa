@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.example.mapper.NoticeMapper">
+
+
+    <insert id="insert">
+        insert into sys_notice(receiver_id,
+                               content,
+                               create_time)
+        values (#{notice.receiverId},
+                #{notice.content},
+                #{notice.createTime})
+    </insert>
+
+    <select id="selectByReceiverId" parameterType="long" resultType="top.example.entity.Notice">
+        select * from sys_notice
+        where receiver_id = #{rid}
+    </select>
+
+
+
+
+</mapper>

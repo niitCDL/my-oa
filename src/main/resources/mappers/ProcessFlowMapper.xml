@@ -26,5 +26,27 @@
                 #{pflow.isLast})
     </insert>
 
+    <update id="update" parameterType="top.example.entity.ProcessFlow">
+        update adm_process_flow
+        set form_id=#{flow.formId},
+            operator_id=#{flow.operatorId},
+            action=#{flow.action},
+            result=#{flow.result},
+            reason=#{flow.reason},
+            create_time=#{flow.createTime},
+            audit_time=#{flow.auditTime},
+            order_no=#{flow.orderNo},
+            state=#{flow.state},
+            is_last=#{flow.isLast}
+        where process_id = #{flow.processId}
+    </update>
+
+
+    <select id="selectByFormId" parameterType="long" resultType="top.example.entity.ProcessFlow">
+        select *
+        from adm_process_flow
+        where form_id = #{id}
+        order by order_no
+    </select>
 
 </mapper>
